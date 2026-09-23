@@ -17,7 +17,7 @@ int main() {
     dest_addr.sin_family = AF_INET;
     string source_ip_address = "";
     cout << "Enter the IP to ping (IPv4): ";
-    cin >> source_ip_address;
+    cin >> source_ip_address; // TODOs: cli args instead of this
     if (inet_pton(AF_INET, source_ip_address.c_str(), &dest_addr.sin_addr) <= 0) {
         cout << "Invalid IPv4 address format!\n";
         close(sock);

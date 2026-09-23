@@ -34,6 +34,7 @@ struct IcmpPacket{
 
 inline int create_icmp_socket() {
     int sock = socket(AF_INET, SOCK_RAW, IPPROTO_ICMP);
+    // TODO: implement a timeout system here...
     return sock;
 }
 
@@ -57,7 +58,7 @@ inline bool send_ping(int sockfd, const sockaddr_in& dest_addr, uint16_t id, uin
     return true;
 }
 
-inline vector<int> receive_ping(int sockfd, uint16_t expected_id) {
+inline vector<int> receive_ping(int sockfd, uint16_t expected_id) { // TODO: pass as pair<int,int> instead of vector
     uint8_t recv_buffer[1024];
     sockaddr_in sender_addr{};
     socklen_t add_len = sizeof(sender_addr);

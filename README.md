@@ -4,10 +4,10 @@ A lightweight, from-scratch implementation of the `ping` utility in modern C++ u
 
 ## Current Features and Future enhancements
 
-- [x] **Socket + Single Packet Round Trip**
-- [ ] **Timing + Real Output Formatting**
-- [ ] **Continuous Loop + Sequence Tracking**
-- [ ] **Timeout / Packet Loss Handling**
-- [ ] **Final Stats Output & CLI args**
+- [x] Socket + Single Packet Round Trip
+- [ ] Timing + Real Output Formatting
+- [ ] Continuous Loop + Sequence Tracking
+- [ ] Timeout / Packet Loss Handling
+- [ ] Final Stats Output & CLI args
 
 ---
