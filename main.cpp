@@ -28,10 +28,9 @@ int main() {
         close(sock);
         return 1;
     }
-    vector<int> res(2);
-    res = receive_ping(sock,pid);
-    if (res[0]!=INT_MAX) {
-        cout<<"64 bytes from "<<source_ip_address<<" : seq="<<res[1]<<" ttl="<<res[0]<<endl;
+    auto res = receive_ping(sock,pid);
+    if (res.first!=INT_MAX) {
+        cout<<"64 bytes from "<<source_ip_address<<" : seq="<<res.second<<" ttl="<<res.first<<endl;
     }
     close(sock);
     return 0;
