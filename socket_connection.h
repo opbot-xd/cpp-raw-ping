@@ -3,8 +3,10 @@
 #include "checksum.h"
 
 #include <iostream>
+#include <chrono>
 #include <vector>
 #include <climits>
+#include <sys/time.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -12,6 +14,7 @@
 #include <unistd.h>
 
 using namespace std;
+using namespace std::chrono;
 
 const int PAYLOAD_SIZE = 56;
 const int PACKET_SIZE = sizeof(uint8_t) * 2 + sizeof(uint16_t) * 3 + PAYLOAD_SIZE; // 64 bytes
@@ -34,7 +37,17 @@ struct IcmpPacket{
 
 inline int create_icmp_socket() {
     int sock = socket(AF_INET, SOCK_RAW, IPPROTO_ICMP);
-    // TODO: implement a timeout system here...
+    if (sock < 0) {
+        return -1;
+    }
+    struct timeval tv;
+    tv.tv_sec = 1;
+    tv.tv_usec = 0;
+    if (setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, (const char*)&tv, sizeof(tv)) < 0) {
+        cerr << "Failed to set socket timeout option\n";
+        close(sock);
+        return -1;
+    }
     return sock;
 }
 
@@ -61,8 +74,8 @@ inline bool send_ping(int sockfd, const sockaddr_in& dest_addr, uint16_t id, uin
 inline pair<int,int> receive_ping(int sockfd, uint16_t expected_id) {
     uint8_t recv_buffer[1024];
     sockaddr_in sender_addr{};
-    socklen_t add_len = sizeof(sender_addr);
     while(1){
+        socklen_t add_len = sizeof(sender_addr);
         ssize_t bytes_received = recvfrom(sockfd, recv_buffer, sizeof(recv_buffer), 0, (struct sockaddr*) &sender_addr, &add_len);
         if(bytes_received<0){
             return {INT_MAX,-1};
