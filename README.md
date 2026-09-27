@@ -9,6 +9,6 @@ A lightweight, from-scratch implementation of the `ping` utility in modern C++ u
 - [x] Timeout / Packet Loss Handling
 - [x] Continuous Loop + Sequence Tracking
 - [x] Final Stats Output & CLI args
-- [ ] Makefile and CLI args
+- [x] Makefile and CLI args
 
 ---

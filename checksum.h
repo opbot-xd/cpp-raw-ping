@@ -3,17 +3,14 @@
 
 using namespace std;
 
-
 inline uint16_t calculate_checksum(const void* data, int length) {
-    const uint8_t* bytes = (const uint8_t*)data;
-    uint32_t sum = 0;
-    for (int i=0;i+1<length;i+=2) {
-        uint16_t word=bytes[i] | (bytes[i+1]<<8); // Assumes little endian architecture
-        sum+=word;
+    const uint16_t* buf=static_cast<const uint16_t*>(data);
+    uint32_t sum=0;
+    for (;length>1;length-=2) {
+        sum += *buf++;
     }
-    if (length % 2 != 0)    sum += bytes[length-1];    // will not be used in our code anyways as length = 64
-    while(sum>>16)    sum=(sum&0xFFFF)+(sum>>16);
-
-    return (uint16_t)(~sum);
-
+    if (length&1)    sum += *(static_cast<const uint8_t*>(static_cast<const void*>(buf))); // our len is 62 so this would not be executed
+    sum=(sum >> 16)+(sum & 0xFFFF);
+    sum+=(sum >> 16);
+    return ~sum;
 }

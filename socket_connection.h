@@ -71,22 +71,24 @@ inline bool send_ping(int sockfd, const sockaddr_in& dest_addr, uint16_t id, uin
     return true;
 }
 
-inline pair<int,int> receive_ping(int sockfd, uint16_t expected_id) {
+inline pair<int,int> receive_ping(int sockfd, uint16_t expected_id, uint16_t expected_seq) {
     uint8_t recv_buffer[1024];
     sockaddr_in sender_addr{};
+    auto start_wait=high_resolution_clock::now();
     while(1){
+        if(duration_cast<seconds>(high_resolution_clock::now()-start_wait).count()>=1)    return {INT_MAX,-1};
         socklen_t add_len = sizeof(sender_addr);
         ssize_t bytes_received = recvfrom(sockfd, recv_buffer, sizeof(recv_buffer), 0, (struct sockaddr*) &sender_addr, &add_len);
         if(bytes_received<0){
             return {INT_MAX,-1};
         }
         int ip_header_len = (recv_buffer[0]&0xF)*4;
+        if(bytes_received<ip_header_len+8)    continue; 
         IcmpPacket* reply = (IcmpPacket*)&recv_buffer[ip_header_len];
-        if (reply->type==0 && ntohs(reply->id)==expected_id) {
+        if (reply->type==0 && ntohs(reply->id)==expected_id && ntohs(reply->seq)==expected_seq) {
             int ttl=recv_buffer[8];
             int out_seq = ntohs(reply->seq);
             return {ttl,out_seq};
         }
-    
     }
 }

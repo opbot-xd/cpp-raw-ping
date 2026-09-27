@@ -19,7 +19,12 @@ void handle_sigint(int signum) {
     keep_running = false;
 }
 
-int main() {
+int main(int argc, char* argv[]) {
+    if(argc<2){
+        cerr<<"Example usage sudo ./myping <ipv4 address>"<<endl;
+        cerr<<"sudo ./myping 8.8.8.8"<<endl;
+        return 1;
+    }
     signal(SIGINT, handle_sigint);
     int received = 0;
     vector<double> rtt;
@@ -32,9 +37,7 @@ int main() {
     int pid = getpid() & 0xFFFF;
     sockaddr_in dest_addr{};
     dest_addr.sin_family = AF_INET;
-    string source_ip_address = "";
-    cout << "Enter the IP to ping (IPv4): ";
-    cin >> source_ip_address; // TODOs: cli args instead of this
+    string source_ip_address=argv[1];
     int seq_number=1;
     if (inet_pton(AF_INET, source_ip_address.c_str(), &dest_addr.sin_addr) <= 0) {
         cerr << "Invalid IPv4 address format!\n";
@@ -49,7 +52,7 @@ int main() {
             close(sock);
             return 1;
         }
-        auto res = receive_ping(sock,pid);
+        auto res = receive_ping(sock,pid,seq_number);
         if (res.first!=INT_MAX) {
             auto end = high_resolution_clock::now();
             auto duration = duration_cast<microseconds>(end-start);
